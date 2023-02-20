@@ -482,7 +482,7 @@ const log = require('logToConsole');
 const initIds = copyFromWindow('_fbq_gtm_ids') || [];
 const pixelIds = data.pixelId;
 const standardEventNames = ['AddPaymentInfo', 'AddToCart', 'AddToWishlist', 'CompleteRegistration', 'Contact', 'CustomizeProduct', 'Donate', 'FindLocation', 'InitiateCheckout', 'Lead', 'PageView', 'Purchase', 'Schedule', 'Search', 'StartTrial', 'SubmitApplication', 'Subscribe', 'ViewContent'];
-const ecommerce = copyFromDataLayer('ecommerce', 1);
+const ecommerce = copyFromDataLayer('ecommerce');
 
 // Helper methods
 const fail = msg => {
@@ -510,10 +510,11 @@ const parseEecObj = prod => {
 let eventName, action, eecObjectProps;
 if (data.enhancedEcommerce) {
   if (!ecommerce) return fail('Facebook Pixel: No valid "ecommerce" object found in dataLayer');
-  if (ecommerce.detail) { eventName = 'ViewContent'; action = 'detail'; }
-  else if (ecommerce.add) { eventName = 'AddToCart'; action = 'add'; }
+  //log(ecommerce);
+  if (ecommerce.purchase) { eventName = 'Purchase'; action = 'purchase'; }
   else if (ecommerce.checkout) { eventName = 'InitiateCheckout'; action = 'checkout'; }
-  else if (ecommerce.purchase) { eventName = 'Purchase'; action = 'purchase'; }
+  else if (ecommerce.add) { eventName = 'AddToCart'; action = 'add'; }
+  else if (ecommerce.detail) { eventName = 'ViewContent'; action = 'detail'; } 
   else return fail('Facebook Pixel: Most recently pushed "ecommerce" object must be one of types "detail", "add", "checkout" or "purchase".');
   
   if (!ecommerce[action].products || getType(ecommerce[action].products) !== 'array') return fail('Facebook pixel: Most recently pushed "ecommerce" object did not have a valid "products" array.');
